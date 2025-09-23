@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ProStroy — Главная</title>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<style>
+  :root{--bg:#0b1220;--panel:#111a2c;--text:#eef3f9;--green:#22c55e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
+  a{text-decoration:none;color:inherit}
+
+  /* top bar */
+  .topbar{display:flex;justify-content:space-between;align-items:center;
+          background:var(--panel);padding:12px 20px;position:sticky;top:0;z-index:10}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:#fff;cursor:pointer}
+  .logo img{width:28px;height:28px}
+  .nav{display:flex;gap:24px;align-items:center}
+  .nav a{color:#9fb0c9;font-weight:500}
+  .nav a:hover{color:var(--green)}
+  .username{font-weight:600;color:#fff}
+
+  /* hero image */
+  .hero{position:relative;height:calc(100vh - 60px);overflow:hidden}
+  .hero img{width:100%;height:100%;object-fit:cover;opacity:.6}
+  .hero .caption{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                 color:#fff;font-size:36px;font-weight:800;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo" onclick="location.href='main.html'">
+      <img src="https://cdn-icons-png.flaticon.com/512/679/679922.png" alt="logo">
+      ProStroy
+    </div>
+    <div class="nav">
+      <a href="requests.html">Заявки</a>
+      <a href="transport.html">Заявка на автотранспорт</a>
+      <a href="profile.html"><span id="who">Личный кабинет</span></a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <img src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=1400&q=80" alt="строительство">
+    <div class="caption">Добро пожаловать в систему ProStroy</div>
+  </div>
+
+<script>
+  const PROJECT_URL = "https://hvpbwpegxcbstmpngdyc.supabase.co";
+  const ANON_KEY    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cGJ3cGVneGNic3RtcG5nZHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2NDE4NjMsImV4cCI6MjA3NDIxNzg2M30.rtPrQVsaEFA-ee1RphLKKn8q3TSOXeapZnZgfe9HVws";
+  const supa = supabase.createClient(PROJECT_URL, ANON_KEY);
+
+  // показать ник/почту пользователя
+  (async()=>{
+    const { data: { user } } = await supa.auth.getUser();
+    if (user){
+      document.getElementById('who').textContent = user.email;
+    }
+  })();
+</script>
+</body>
+</html>
