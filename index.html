@@ -83,44 +83,68 @@
     </div>
   </div>
 
-  <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
-    const supa = supabase.createClient(
-      "https://hvpbwpegxcbstmpngdyc.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cGJ3cGVneGNic3RtcG5nZHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2NDE4NjMsImV4cCI6MjA3NDIxNzg2M30.rtPrQVsaEFA-ee1RphLKKn8q3TSOXeapZnZgfe9HVws",
-      { auth:{ persistSession:true } }
-    );
+<script>
+  // 0) Настройки
+  const SB_URL  = "https://hvpbwpegxcbstmpngdyc.supabase.co";
+  const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cGJ3cGVneGNic3RtcG5nZHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2NDE4NjMsImV4CI6MjA3NDIxNzg2M30.rtPrQVsaEFA-ee1RphLKKn8q3TSOXeapZnZgfe9HVws";
 
-    // Если уже залогинен → сразу на main
-    (async ()=>{
-      const { data:{ session } } = await supa.auth.getSession();
-      if(session){ location.replace('main.html'); }
-    })();
+  // 1) Клиент: с persist=true, чтобы сессия не терялась при перезагрузке
+  const supa = supabase.createClient(SB_URL, SB_ANON, { auth: { persistSession: true } });
 
-    // Глазик
+  // 2) Если уже есть сессия — сразу на main (без миганий)
+  (async () => {
+    const { data: { session } } = await supa.auth.getSession();
+    if (session) {
+      location.replace('main.html');   // назад не вернет на логин
+      return;
+    }
+  })();
+
+  // 3) Глазик (если у тебя есть кнопка с id="togglePwd")
+  (() => {
     const pwd = document.getElementById('password');
-    const openI = document.getElementById('eyeOpen');
-    const closedI = document.getElementById('eyeClosed');
-    document.getElementById('togglePwd').addEventListener('click',()=>{
-      const show = pwd.type==='password';
-      pwd.type = show?'text':'password';
-      openI.style.display = show?'none':'block';
-      closedI.style.display = show?'block':'none';
-    });
+    const toggle = document.getElementById('togglePwd');
+    if (pwd && toggle) {
+      const eyeOpen = document.getElementById('eyeOpen');
+      const eyeClosed = document.getElementById('eyeClosed');
+      toggle.addEventListener('click', () => {
+        const show = pwd.type === 'password';
+        pwd.type = show ? 'text' : 'password';
+        if (eyeOpen && eyeClosed) {
+          eyeOpen.style.display = show ? 'none' : 'block';
+          eyeClosed.style.display = show ? 'block' : 'none';
+        }
+      });
+    }
+  })();
 
-    // Логин
-    const form = document.getElementById('loginForm');
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      const password = pwd.value.trim();
-      const err = document.getElementById('err'); err.textContent='';
+  // 4) Логин — только через JS. В теге <form> не должно быть action=""
+  const form = document.getElementById('loginForm');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault(); // ВАЖНО: чтобы страница не перезагружалась
+    const email = (document.getElementById('email')?.value || '').trim();
+    const password = (document.getElementById('password')?.value || '').trim();
+    const errEl = document.getElementById('err');
+    if (errEl) errEl.textContent = '';
 
-      const { error } = await supa.auth.signInWithPassword({ email, password });
-      if(error){ err.textContent = error.message; return; }
-      location.replace('main.html'); // назад не вернёт
-    });
-  </script>
+    // попытка входа
+    const { data, error } = await supa.auth.signInWithPassword({ email, password });
+    if (error) {
+      if (errEl) errEl.textContent = error.message || 'Ошибка входа';
+      return;
+    }
+
+    // иногда сессия появляется с микрозадержкой — подождём гарантированно
+    for (let i = 0; i < 8; i++) {
+      const { data: { session } } = await supa.auth.getSession();
+      if (session) break;
+      await new Promise(r => setTimeout(r, 120));
+    }
+
+    // Переходим на главную и «забываем» логин в истории
+    location.replace('main.html');
+  });
+</script>
 </body>
 </html>
