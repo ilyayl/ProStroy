@@ -6,7 +6,7 @@ const ANON_KEY    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 // SDK Supabase уже загружен на странице, создаём клиент
 window.supa = window.supabase.createClient(PROJECT_URL, ANON_KEY, {
-  auth: { persistSession: true, storage: window.sessionStorage }
+  auth: { persistSession: false }
 });
 
 /** Подтягивает header.html и настраивает меню/имя пользователя */
