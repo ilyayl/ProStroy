@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Автотранспорт · ProStroy</title>
+<style>
+  html,body{height:100%;margin:0;background:#0b1220;color:#fff;font-family:system-ui}
+  .wrap{max-width:760px;margin:80px auto 40px;padding:0 16px}
+  .f{display:grid;gap:12px}
+  input,textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);
+    color:#fff;border-radius:10px;padding:12px}
+  button{background:#1ed760;color:#062410;border:none;border-radius:10px;padding:12px 16px;font-weight:800}
+</style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <div class="wrap">
+    <h2>Новая заявка на автотранспорт</h2>
+    <form id="tform" class="f">
+      <input id="title" placeholder="Заголовок" required>
+      <textarea id="details" rows="6" placeholder="Описание / маршрут / дата / время" required></textarea>
+      <button type="submit">Отправить</button>
+      <div id="msg"></div>
+    </form>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    const supa = supabase.createClient(
+      "https://hvpbwpegxcbstmpngdyc.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cGJ3cGVneGNic3RtcG5nZHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2NDE4NjMsImV4cCI6MjA3NDIxNzg2M30.rtPrQVsaEFA-ee1RphLKKn8q3TSOXeapZnZgfe9HVws",
+      { auth:{ persistSession:false } }
+    );
+    history.replaceState(null,'',location.href);
+    (async ()=>{
+      const { data:{ session } } = await supa.auth.getSession();
+      if(!session){ location.href='index.html'; return; }
+      const email = session.user.email;
+      document.getElementById('who')?.textContent = email;
+      document.getElementById('btnLogout')?.addEventListener('click', async (e)=>{
+        e.preventDefault(); await supa.auth.signOut(); location.replace('index.html');
+      });
+
+      // Пока без БД — просто имитация отправки.
+      document.getElementById('tform').addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const title = document.getElementById('title').value.trim();
+        const details = document.getElementById('details').value.trim();
+        if(!title||!details) return;
+        alert('Заявка отправлена: ' + title);
+        // позже тут сделаем insert в public.requests со status='submitted'
+        e.target.reset();
+      });
+    })();
+  </script>
+  <script src="header.js"></script>
+  <script>loadHeader('site-header');</script>
+</body>
+</html>
