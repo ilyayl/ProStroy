@@ -1,117 +1,170 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Вход | ProStroy</title>
 
-<!-- Supabase SDK v2 -->
+<!-- 1) Подключаем Supabase SDK ПЕРЕД любым кодом, который его использует -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script>
-  // === ВСТАВЬ СВОИ КЛЮЧИ ИЗ SUPABASE (Settings → API) ===
-  const PROJECT_URL = "https://hvpbwpegxcbstmpngdyc.supabase.co";   // напр. https://xxxx.supabase.co
-  const ANON_KEY    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cGJ3cGVneGNic3RtcG5nZHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2NDE4NjMsImV4cCI6MjA3NDIxNzg2M30.rtPrQVsaEFA-ee1RphLKKn8q3TSOXeapZnZgfe9HVws";      // public anon key
-  const supa = supabase.createClient(PROJECT_URL, ANON_KEY);
-
-  // если уже авторизован — сразу на главную
-  window.addEventListener('DOMContentLoaded', async () => {
-    const { data: { session } } = await supa.auth.getSession();
-    if (session) location.href = 'main.html';
-
-    // метаданные (оставил как у тебя)
-    document.getElementById('client_ts').value = new Date().toISOString();
-    document.getElementById('user_agent').value = navigator.userAgent;
-    document.getElementById('source_page').value = location.href;
-  });
-
-  async function loginSupabase(ev){
-    ev.preventDefault();
-    const email = document.getElementById('login').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const errEl = document.getElementById('err');
-
-    // Supabase логинит по email+пароль
-    if (!email.includes('@')) {
-      errEl.textContent = 'Введите e-mail (авторизация по email и паролю).';
-      return;
-    }
-
-    const { error } = await supa.auth.signInWithPassword({ email, password });
-    if (error) { errEl.textContent = error.message; return; }
-
-    // успех → мгновенный переход
-    location.href = 'main.html';
-  }
-
-  // показать/скрыть пароль
-  function togglePwd(){
-    const pwd = document.getElementById('password');
-    const show = pwd.type === 'password';
-    pwd.type = show ? 'text' : 'password';
-    document.getElementById('eyeOpen').style.display   = show ? 'none' : 'block';
-    document.getElementById('eyeClosed').style.display = show ? 'block' : 'none';
-  }
-</script>
 
 <style>
   *,*::before,*::after{box-sizing:border-box}
   html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#fff;overflow:hidden}
-
-  /* BG video */
+  /* Фон-видео */
   .bg video{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-2}
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:-1}
-
-  /* Card */
+  /* Карточка */
   .wrap{height:100%;display:grid;place-items:center;padding:24px}
   .card{
-    width:min(92vw, 900px); max-width:900px;
-    padding:36px 40px; border-radius:20px;
-    background:rgba(255,255,255,.10);
-    backdrop-filter:blur(14px) saturate(140%);
+    width:min(92vw, 900px);max-width:900px;padding:36px 40px;border-radius:20px;
+    background:rgba(255,255,255,.10);backdrop-filter:blur(14px) saturate(140%);
     -webkit-backdrop-filter:blur(14px) saturate(140%);
-    border:1px solid rgba(255,255,255,.18); box-shadow:0 10px 30px rgba(0,0,0,.35)
+    border:1px solid rgba(255,255,255,.18);box-shadow:0 10px 30px rgba(0,0,0,.35)
   }
   h1{margin:0 0 6px;font-size:40px;text-align:center}
   .subtitle{margin:0 0 28px;text-align:center;color:#d1d5db}
-
   .form{max-width:720px;margin:0 auto}
   .row{margin-bottom:16px}
   label{display:block;margin-bottom:8px;font-size:15px;color:#e5e7eb}
-
   .field{position:relative}
   input[type="text"],input[type="password"]{
-    width:100%;height:52px;padding:14px 48px 14px 16px;
-    border-radius:12px;border:1px solid rgba(255,255,255,.25);
-    background:rgba(255,255,255,.14);color:#fff;outline:none
+    width:100%;height:52px;padding:14px 48px 14px 16px;border-radius:12px;
+    border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.14);color:#fff;outline:none
   }
   input::placeholder{color:#cbd5e1}
   input:focus{box-shadow:0 0 0 4px rgba(34,197,94,.18);border-color:rgba(34,197,94,.7)}
-
-  /* Eye icon */
-  .eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);
-       width:28px;height:28px;display:grid;place-items:center;
-       background:transparent;border:none;cursor:pointer;outline:none}
+  .eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:28px;height:28px;display:grid;place-items:center;background:transparent;border:none;cursor:pointer;outline:none}
   .eye svg{width:22px;height:22px;fill:#e5e7eb;opacity:.9}
-
-  /* Controls */
   .controls{max-width:720px;margin:6px auto 0}
   .remember-line{display:flex;align-items:center;gap:10px}
-  .remember-line span{font-size:15px}
-  .remember-line input[type="checkbox"]{
-    margin-left:auto;width:18px;height:18px;accent-color:#22c55e;cursor:pointer
-  }
+  .remember-line input[type="checkbox"]{margin-left:auto;width:18px;height:18px;accent-color:#22c55e;cursor:pointer}
   .forgot{margin-top:6px;text-align:right}
   .forgot a{color:#7dd3fc;text-decoration:none;font-size:15px}
-
-  .btn{display:block;width:100%;max-width:720px;margin:16px auto 0;height:52px;
-       border:none;border-radius:12px;background:#22c55e;color:#fff;
-       font-weight:800;letter-spacing:.2px;cursor:pointer}
+  .btn{display:block;width:100%;max-width:720px;margin:16px auto 0;height:52px;border:none;border-radius:12px;background:#22c55e;color:#fff;font-weight:800;letter-spacing:.2px;cursor:pointer}
   .btn:hover{background:#16a34a}
-
-  #err{margin-top:10px;color:#ff7a7a;min-height:22px}
+  #err{margin-top:10px;color:#ff7a7a;min-height:22px;white-space:pre-wrap}
+  #warn{margin-top:12px;color:#ffe08a}
 </style>
 </head>
 <body>
-  <!-- Background video -->
+  <!-- Фон-видео -->
   <div class="bg">
-    <video autoplay
+    <video autoplay muted loop playsinline>
+      <source src="https://assets.mixkit.co/videos/30431/30431-720.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="overlay"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <h1>Вход в систему</h1>
+      <p class="subtitle">ProStroy</p>
+
+      <form class="form" id="loginForm">
+        <div class="row">
+          <label for="login">Email</label>
+          <div class="field">
+            <input id="login" name="login" type="text" placeholder="boss@prostroy.ru" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <label for="password">Пароль</label>
+          <div class="field">
+            <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+            <button type="button" class="eye" id="togglePwd" aria-label="Показать пароль">
+              <svg id="eyeOpen" viewBox="0 0 24 24"><path d="M12 5C5 5 1.5 12 1.5 12S5 19 12 19s10.5-7 10.5-7S19 5 12 5zm0 10a3 3 0 110-6 3 3 0 010 6z"/></svg>
+              <svg id="eyeClosed" style="display:none" viewBox="0 0 24 24"><path d="M3.27 2L2 3.27 5.73 7C3.73 8.34 2.31 10.04 1.5 12c0 0 3.5 7 10.5 7 2.08 0 3.9-.43 5.47-1.16l3.76 3.76L22 20.73 3.27 2zM12 7a5 5 0 014.9 6.09l-1.73-1.73A3 3 0 0012 9a3 3 0 00-2.36 1.18L7.41 8c1.12-.62 2.47-1 4.59-1z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <label class="remember-line" for="remember">
+            <span>Запомнить меня</span>
+            <input id="remember" type="checkbox" name="remember" value="1">
+          </label>
+          <div class="forgot"><a href="#" onclick="alert('Восстановление добавим позже')">Забыли пароль?</a></div>
+        </div>
+
+        <button class="btn" type="submit">Войти</button>
+        <div id="err"></div>
+        <div id="warn"></div>
+
+        <!-- мета -->
+        <input type="hidden" id="client_ts">
+        <input type="hidden" id="user_agent">
+        <input type="hidden" id="source_page">
+      </form>
+    </div>
+  </div>
+
+<script>
+(function(){
+  // 2) Настройки проекта — ПОДСТАВЬ СВОИ ЗНАЧЕНИЯ
+  const PROJECT_URL = "YOUR_PROJECT_URL"; // пример: https://hvpbwpegxcbstmpngdyc.supabase.co
+  const ANON_KEY    = "YOUR_ANON_KEY";    // длинная строка из Settings → API (anon public)
+
+  const errEl  = document.getElementById('err');
+  const warnEl = document.getElementById('warn');
+
+  // подстраховка: покажем явное предупреждение, если ключи не подставлены
+  if (PROJECT_URL.includes('YOUR_') || ANON_KEY.includes('YOUR_')) {
+    warnEl.textContent = "⚠️ Не подставлены PROJECT_URL и/или ANON_KEY. Возьми их в Supabase → Settings → API.";
+  }
+
+  // переключатель пароля
+  document.getElementById('togglePwd').addEventListener('click', () => {
+    const pwd = document.getElementById('password');
+    const show = (pwd.type === 'password');
+    pwd.type = show ? 'text' : 'password';
+    document.getElementById('eyeOpen').style.display   = show ? 'none' : 'block';
+    document.getElementById('eyeClosed').style.display = show ? 'block' : 'none';
+  });
+
+  // метаданные (как просил — оставил)
+  document.getElementById('client_ts').value = new Date().toISOString();
+  document.getElementById('user_agent').value = navigator.userAgent;
+  document.getElementById('source_page').value = location.href;
+
+  // страховка: если supabase не загрузился
+  if (typeof supabase === 'undefined') {
+    errEl.textContent = "Supabase SDK не загрузился. Проверь <script src='https://unpkg.com/@supabase/supabase-js@2'></script> и интернет.";
+    return;
+  }
+
+  const supa = supabase.createClient(PROJECT_URL, ANON_KEY);
+
+  // если уже вошёл — сразу на main.html
+  supa.auth.getSession().then(({ data:{ session } }) => {
+    if (session) location.href = 'main.html';
+  }).catch(e => {
+    errEl.textContent = 'Ошибка сессии: ' + (e?.message || e);
+  });
+
+  // хендлер логина
+  document.getElementById('loginForm').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    errEl.textContent = '';
+
+    const email = document.getElementById('login').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!email.includes('@')) {
+      errEl.textContent = 'Введите e-mail (Supabase авторизует по email + пароль).';
+      return;
+    }
+
+    try {
+      const { error } = await supa.auth.signInWithPassword({ email, password });
+      if (error) { errEl.textContent = error.message; return; }
+      location.href = 'main.html';
+    } catch (e) {
+      errEl.textContent = 'Неожиданная ошибка: ' + (e?.message || e);
+    }
+  });
+})();
+</script>
+</body>
+</html>
