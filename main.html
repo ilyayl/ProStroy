@@ -1,75 +1,154 @@
-<!doctype html><html lang="ru"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ProStroy — Главная</title>
-<style>
-  :root{--bg:#0b1220;--text:#eef3f9;--muted:#9fb0c9;--green:#22c55e;--glass:rgba(255,255,255,.08);--header-h:60px;--gap:18px}
-  *{box-sizing:border-box}
-  html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui;display:none}
-  #site-header{position:relative;z-index:5}
-  .bgv{position:fixed;inset:0;z-index:0}
-  .bgv video{width:100%;height:100%;object-fit:cover}
-  .overlay{position:fixed;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,.45));z-index:1}
-  .left-dock{position:fixed;left:var(--gap);top:calc(var(--header-h)+var(--gap));bottom:var(--gap);width:min(560px,92vw);
-             padding:16px;background:var(--glass);backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%);
-             border:1px solid rgba(255,255,255,.15);border-radius:16px;box-shadow:0 20px 45px rgba(0,0,0,.35);z-index:2;overflow:auto}
-  .left-dock h1{margin:0 0 6px;font-size:28px;font-weight:900}
-  .subtitle{margin:0 0 14px;color:var(--muted)}
-  .quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 6px}
-  .tile{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:12px;text-decoration:none;color:var(--text);display:flex;flex-direction:column;gap:6px}
-  .tile:hover{outline:2px solid var(--green)} .tile .t{font-weight:800} .tile .d{color:var(--muted);font-size:13px}
-  .objects{margin-top:12px;display:grid;gap:10px}
-  .obj{padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.28);display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(255,255,255,.16)}
-  .badge{background:#24324d;padding:3px 8px;border-radius:999px;font-size:12px;text-transform:uppercase}
-  .cta{margin-top:12px}.cta a{display:inline-block;background:var(--green);color:#062410;font-weight:900;padding:10px 14px;border-radius:10px;text-decoration:none}
-  @media (max-width:720px){.quick{grid-template-columns:1fr 1fr}}
-</style>
-</head><body>
-<div id="site-header"></div>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProStroy · Главная</title>
+  <style>
+    :root {
+      --bg-dark: rgba(0, 0, 0, 0.55);
+      --green: #1ed760;
+      --text: #fff;
+      --muted: #cfcfcf;
+      --radius: 12px;
+    }
 
-<div class="bgv">
-  <video autoplay muted loop playsinline>
-    <source src="https://assets.mixkit.co/videos/30431/30431-720.mp4" type="video/mp4">
-  </video>
-</div>
-<div class="overlay"></div>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      overflow: hidden;
+    }
 
-<aside class="left-dock">
-  <h1>Добро пожаловать в ProStroy</h1>
-  <p class="subtitle">Быстрые действия и актуальные объекты</p>
-  <div class="quick">
-    <a class="tile" href="requests.html"><span class="t">Заявки</span><span class="d">Список и статусы</span></a>
-    <a class="tile" href="transport.html"><span class="t">Автотранспорт</span><span class="d">Создать заявку</span></a>
-    <a class="tile" href="profile.html"><span class="t">Личный кабинет</span><span class="d" id="u-short">Профиль пользователя</span></a>
+    /* Фон с видео */
+    .background {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .background video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Контейнер страницы */
+    .page {
+      display: flex;
+      height: calc(100% - 60px); /* минус высота хедера */
+    }
+
+    /* Левый блок */
+    .sidebar {
+      background: var(--bg-dark);
+      padding: 20px;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      height: 100%;
+      margin-left: 40px; /* сдвиг влево */
+      border-radius: var(--radius);
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+
+    .object {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: var(--radius);
+    }
+    .status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .status.work { background: #1ed760; color: #000; }
+    .status.prep { background: #ffd166; color: #000; }
+    .status.agree { background: #7abfff; color: #000; }
+
+    .new-request {
+      margin-top: auto;
+      padding: 12px;
+      background: var(--green);
+      color: #000;
+      text-align: center;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .new-request:hover {
+      background: #17b94c;
+    }
+  </style>
+</head>
+<body>
+  <!-- Фон с видео -->
+  <div class="background">
+    <video autoplay muted loop playsinline>
+      <source src="https://assets.mixkit.co/videos/30431/30431-720.mp4" type="video/mp4">
+    </video>
   </div>
-  <div class="objects">
-    <div class="obj"><div><b>Объект: Склад №7</b> — Восточный кластер</div><span class="badge">в работе</span></div>
-    <div class="obj"><div><b>Объект: ЖК «Северный»</b> — Блок Б2</div><span class="badge">подготовка</span></div>
-    <div class="obj"><div><b>Объект: Транспортный узел</b> — Секция 3</div><span class="badge">согласование</span></div>
+
+  <!-- Хедер -->
+  <div id="header"></div>
+
+  <!-- Контент -->
+  <div class="page">
+    <div class="sidebar">
+      <h2>Добро пожаловать в ProStroy</h2>
+
+      <div class="nav-links">
+        <a href="zayavki.html">Заявки</a>
+        <a href="avtotransport.html">Автотранспорт</a>
+        <a href="profile.html">Личный кабинет</a>
+      </div>
+
+      <div class="object">
+        <div>Объект: Склад №7 — Восточный кластер</div>
+        <div class="status work">В РАБОТЕ</div>
+      </div>
+      <div class="object">
+        <div>Объект: ЖК «Северный» — Блок Б2</div>
+        <div class="status prep">ПОДГОТОВКА</div>
+      </div>
+      <div class="object">
+        <div>Объект: Транспортный узел — Секция 3</div>
+        <div class="status agree">СОГЛАСОВАНИЕ</div>
+      </div>
+
+      <a href="avtotransport.html" class="new-request">+ Новая заявка на автотранспорт</a>
+    </div>
   </div>
-  <div class="cta"><a href="transport.html">+ Новая заявка на автотранспорт</a></div>
-</aside>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script src="header.js?v=hard"></script>
-<script>
-(async () => {
-  try {
-    await makeClient();
-    const { data:{ session } } = await supa.auth.getSession();
-    if (!session) { location.href = 'index.html'; return; } // нет сессии — на логин
-
-    await loadHeader();
-    const email = session.user?.email;
-    if (email) document.getElementById('u-short')?.textContent = email;
-  } catch (e) {
-    console.error(e);
-    // если что-то упало — отправим на логин
-    location.href = 'index.html';
-    return;
-  }
-
-  // показать страницу (если ты где-то скрывал body)
-  document.body.style.display = 'block';
-})();
-</script>
-</body></html>
+  <script src="header.js"></script>
+</body>
+</html>
