@@ -5,57 +5,29 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Вход | ProStroy</title>
 
-<!-- Supabase SDK -->
+<!-- 1) Библиотека Supabase (UMD) -->
+<!-- Важно: type="module" тут НЕ нужен. Эта сборка кладёт объект supabase в window -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script>
-  // ⬇️ ВСТАВЬ СВОИ ДАННЫЕ ИЗ SUPABASE
-  const supa = supabase.createClient("https://hvpbwpegxcbstmpngdyc.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cGJ3cGVneGNic3RtcG5nZHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2NDE4NjMsImV4cCI6MjA3NDIxNzg2M30.rtPrQVsaEFA-ee1RphLKKn8q3TSOXeapZnZgfe9HVws");
-
-  async function loginSupabase(ev){
-    ev.preventDefault();
-
-    const emailOrLogin = document.getElementById('login').value.trim();
-    const password     = document.getElementById('password').value.trim();
-    const errEl        = document.getElementById('err');
-
-    // Supabase стандартно логинит по email+пароль.
-    if (!emailOrLogin.includes('@')) {
-      errEl.textContent = 'Введите e-mail (у Supabase авторизация по email и паролю).';
-      return;
-    }
-
-    const { error } = await supa.auth.signInWithPassword({
-      email: emailOrLogin,
-      password
-    });
-
-    if (error) {
-      errEl.textContent = error.message;
-      return;
-    }
-
-    // Ок — идём на главную
-    window.location.href = 'main.html';
-  }
-</script>
 
 <style>
+  /* БАЗОВЫЕ СТИЛИ — можно править на вкус */
   *,*::before,*::after{box-sizing:border-box}
   html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#fff;overflow:hidden}
 
-  /* BG video */
+  /* Фон-видео */
   .bg video{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-2}
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:-1}
 
-  /* Card */
+  /* Карточка входа */
   .wrap{height:100%;display:grid;place-items:center;padding:24px}
   .card{
-    width:min(92vw, 900px); max-width:900px;
+    width:min(92vw, 900px);
     padding:36px 40px; border-radius:20px;
     background:rgba(255,255,255,.10);
     backdrop-filter:blur(14px) saturate(140%);
     -webkit-backdrop-filter:blur(14px) saturate(140%);
-    border:1px solid rgba(255,255,255,.18); box-shadow:0 10px 30px rgba(0,0,0,.35)
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 10px 30px rgba(0,0,0,.35)
   }
   h1{margin:0 0 6px;font-size:40px;text-align:center}
   .subtitle{margin:0 0 28px;text-align:center;color:#d1d5db}
@@ -65,7 +37,7 @@
   label{display:block;margin-bottom:8px;font-size:15px;color:#e5e7eb}
 
   .field{position:relative}
-  input[type="text"],input[type="password"]{
+  input[type="email"],input[type="password"]{
     width:100%;height:52px;padding:14px 48px 14px 16px;
     border-radius:12px;border:1px solid rgba(255,255,255,.25);
     background:rgba(255,255,255,.14);color:#fff;outline:none
@@ -73,13 +45,11 @@
   input::placeholder{color:#cbd5e1}
   input:focus{box-shadow:0 0 0 4px rgba(34,197,94,.18);border-color:rgba(34,197,94,.7)}
 
-  /* Eye icon */
   .eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);
        width:28px;height:28px;display:grid;place-items:center;
        background:transparent;border:none;cursor:pointer;outline:none}
   .eye svg{width:22px;height:22px;fill:#e5e7eb;opacity:.9}
 
-  /* Controls: remember + forgot */
   .controls{max-width:720px;margin:6px auto 0}
   .remember-line{display:flex;align-items:center;gap:10px}
   .remember-line span{font-size:15px}
@@ -93,12 +63,13 @@
        border:none;border-radius:12px;background:#22c55e;color:#fff;
        font-weight:800;letter-spacing:.2px;cursor:pointer}
   .btn:hover{background:#16a34a}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
 
   #err{margin-top:8px;color:#ff7a7a;min-height:20px}
 </style>
 </head>
 <body>
-  <!-- Background video -->
+  <!-- Фон-видео (можно заменить ссылку на свою) -->
   <div class="bg">
     <video autoplay muted loop playsinline>
       <source src="https://assets.mixkit.co/videos/30431/30431-720.mp4" type="video/mp4">
@@ -111,12 +82,12 @@
       <h1>Вход в систему</h1>
       <p class="subtitle">ProStroy</p>
 
-      <!-- action убран, работаем через JS → loginSupabase(event) -->
-      <form class="form" id="loginForm" onsubmit="loginSupabase(event)">
+      <!-- 2) Форма входа. Делаем вход ЧЕРЕЗ JS (onsubmit). Никаких action не нужно -->
+      <form class="form" id="loginForm">
         <div class="row">
-          <label for="login">Логин (телефон или email)</label>
+          <label for="login">E-mail</label>
           <div class="field">
-            <input id="login" name="login" type="text" placeholder="boss@prostroy.ru" autocomplete="username" required>
+            <input id="login" name="login" type="email" placeholder="boss@prostroy.ru" autocomplete="username" required>
           </div>
         </div>
 
@@ -131,29 +102,104 @@
           </div>
         </div>
 
-        <!-- скрытые метаданные (оставил — пригодятся, если захочешь логировать в БД) -->
+        <!-- НЕобязательные скрытые поля — пригодятся если начнёшь логировать -->
         <input type="hidden" name="client_ts" id="client_ts">
         <input type="hidden" name="user_agent" id="user_agent">
         <input type="hidden" name="source_page" id="source_page">
-        <input type="hidden" name="form_version" value="prostroy-login-v4">
+        <input type="hidden" name="form_version" value="prostroy-login-v1">
 
-        <!-- чекбокс справа в строке -->
         <div class="controls">
           <label class="remember-line" for="remember">
-            <span>Запомнить меня</span>
+            <span>Запомнить e-mail</span>
             <input id="remember" type="checkbox" name="remember" value="1">
           </label>
-          <div class="forgot"><a href="#">Забыли пароль?</a></div>
+          <div class="forgot"><a href="#" id="restoreLink">Забыли пароль?</a></div>
         </div>
 
-        <button class="btn" type="submit">Войти</button>
+        <button class="btn" id="loginBtn" type="submit">Войти</button>
         <div id="err"></div>
       </form>
     </div>
   </div>
 
 <script>
-  // eye toggle
+  /* ==========================
+     3) НАСТРОЙКА SUPABASE
+     ========================== */
+
+  // !!! ЗАМЕНИ на свои значения !!!
+  const SUPABASE_URL = "https://hvpbwpegxcbstmpngdyc.supabase.co"; // <-- твой Project URL
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cGJ3cGVneGNic3RtcG5nZHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2NDE4NjMsImV4cCI6MjA3NDIxNzg2M30.rtPrQVsaEFA-ee1RphLKKn8q3TSOXeapZnZgfe9HVws"; // <-- твой anon key
+
+  // Клиент Supabase
+  const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  /* ==========================
+     4) ПОВЕДЕНИЕ СТРАНИЦЫ
+     ========================== */
+
+  // a) Если пользователь уже залогинен — сразу отправляем на main.html
+  (async () => {
+    try {
+      const { data: { session }, error } = await supa.auth.getSession();
+      if (error) console.warn(error);
+      if (session) {
+        location.href = 'main.html'; // Файл main.html должен лежать рядом с index.html
+      }
+    } catch(e){ console.error(e); }
+  })();
+
+  // b) Обработчик отправки формы логина
+  const form = document.getElementById('loginForm');
+  const btn = document.getElementById('loginBtn');
+  const errEl = document.getElementById('err');
+
+  // Метаданные (необязательно)
+  document.getElementById('client_ts').value = new Date().toISOString();
+  document.getElementById('user_agent').value = navigator.userAgent;
+  document.getElementById('source_page').value = location.href;
+
+  // Подтягиваем email из localStorage если включали "Запомнить"
+  const savedEmail = localStorage.getItem('prostroy_email');
+  if (savedEmail) {
+    document.getElementById('login').value = savedEmail;
+    document.getElementById('remember').checked = true;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errEl.textContent = '';
+
+    const email = document.getElementById('login').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const remember = document.getElementById('remember').checked;
+
+    if (!email) { errEl.textContent = 'Введите e-mail.'; return; }
+    if (!password) { errEl.textContent = 'Введите пароль.'; return; }
+
+    // Блокируем кнопку на время запроса (анти-дубльклик)
+    btn.disabled = true;
+
+    // Логинимся в Supabase
+    const { data, error } = await supa.auth.signInWithPassword({ email, password });
+
+    // Возвращаем кнопку
+    btn.disabled = false;
+
+    if (error) {
+      errEl.textContent = error.message || 'Не удалось войти. Проверьте e-mail и пароль.';
+      return;
+    }
+
+    // Сохраняем e-mail если пользователь отметил чекбокс
+    if (remember) localStorage.setItem('prostroy_email', email);
+    else localStorage.removeItem('prostroy_email');
+
+    // Успешно — на главную
+    location.href = 'main.html';
+  });
+
+  // c) Переключатель "показать пароль"
   const pwd = document.getElementById('password');
   const openI = document.getElementById('eyeOpen');
   const closedI = document.getElementById('eyeClosed');
@@ -164,10 +210,27 @@
     closedI.style.display = show ? 'block' : 'none';
   });
 
-  // metadata
-  document.getElementById('client_ts').value = new Date().toISOString();
-  document.getElementById('user_agent').value = navigator.userAgent;
-  document.getElementById('source_page').value = location.href;
+  // d) "Забыли пароль?" — отправка magic-link на почту (по желанию)
+  // Работает, если в Supabase включена Email Auth и настроены шаблоны
+  document.getElementById('restoreLink').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login').value.trim();
+    if (!email) { errEl.textContent = 'Введите e-mail в поле выше, чтобы восстановить доступ.'; return; }
+    try{
+      btn.disabled = true;
+      const { error } = await supa.auth.resetPasswordForEmail(email, {
+        redirectTo: location.origin + location.pathname.replace('index.html','') + 'reset.html' // сделай reset.html при желании
+      });
+      btn.disabled = false;
+      if (error) { errEl.textContent = error.message; return; }
+      errEl.style.color = '#ffd166';
+      errEl.textContent = 'Если e-mail существует, письмо отправлено. Проверьте почту.';
+      setTimeout(()=>{ errEl.style.color = '#ff7a7a'; }, 4000);
+    } catch (e) {
+      btn.disabled = false;
+      errEl.textContent = 'Ошибка при отправке письма.';
+    }
+  });
 </script>
 </body>
 </html>
