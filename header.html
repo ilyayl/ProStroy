@@ -1,0 +1,63 @@
+<!-- Общий верхний бар. Лого → main.html -->
+<style>
+  :root{
+    --panel:#111a2c;
+    --text:#eef3f9;
+    --muted:#9fb0c9;
+    --green:#22c55e; /* зелёный как на авторизации */
+  }
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--panel);
+    padding:12px 18px;
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    cursor:pointer;
+  }
+  .logo span.ps{
+    font-size:28px;
+    font-weight:900;
+    color:var(--green);
+    letter-spacing:2px;
+  }
+  .logo span.name{
+    font-size:18px;
+    font-weight:700;
+    color:var(--text);
+  }
+  .nav{
+    display:flex;
+    gap:22px;
+    align-items:center;
+  }
+  .nav a{
+    color:var(--muted);
+    text-decoration:none;
+    font-weight:600;
+  }
+  .nav a.active,
+  .nav a:hover{
+    color:var(--green);
+  }
+</style>
+
+<div class="topbar">
+  <a class="logo" href="main.html" id="logoLink">
+    <span class="ps">PS</span>
+    <span class="name">ProStroy</span>
+  </a>
+  <nav class="nav">
+    <a href="requests.html"  id="lnk-requests">Заявки</a>
+    <a href="transport.html" id="lnk-transport">Заявка на автотранспорт</a>
+    <a href="profile.html"   id="lnk-profile"><span id="who">Личный кабинет</span></a>
+  </nav>
+</div>
