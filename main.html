@@ -4,60 +4,167 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>ProStroy — Главная</title>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-  :root{--bg:#0b1220;--panel:#111a2c;--text:#eef3f9;--green:#22c55e}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
-  a{text-decoration:none;color:inherit}
+  :root{
+    --bg:#0b1220;        /* тёмный фон вокруг */
+    --text:#eef3f9;      /* белый текст */
+    --muted:#9fb0c9;     /* приглушённый */
+    --green:#22c55e;     /* зелёный акцент */
+    --panel:#111a2c;     /* панели */
+    --glass:rgba(255,255,255,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui}
 
-  /* top bar */
-  .topbar{display:flex;justify-content:space-between;align-items:center;
-          background:var(--panel);padding:12px 20px;position:sticky;top:0;z-index:10}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:#fff;cursor:pointer}
-  .logo img{width:28px;height:28px}
-  .nav{display:flex;gap:24px;align-items:center}
-  .nav a{color:#9fb0c9;font-weight:500}
-  .nav a:hover{color:var(--green)}
-  .username{font-weight:600;color:#fff}
+  /* контейнер header'а (подтянется через header.js → loadHeader) */
+  #site-header{position:relative;z-index:5}
 
-  /* hero image */
-  .hero{position:relative;height:calc(100vh - 60px);overflow:hidden}
-  .hero img{width:100%;height:100%;object-fit:cover;opacity:.6}
-  .hero .caption{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                 color:#fff;font-size:36px;font-weight:800;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+  /* герой-секция с фоном */
+  .hero{
+    position:relative;
+    min-height:calc(100vh - 60px);
+    overflow:hidden;
+    isolation:isolate; /* чтобы overlay работал поверх изображения */
+  }
+  .hero img.bg{
+    position:absolute; inset:0;
+    width:100%; height:100%; object-fit:cover;
+    filter:contrast(1.05) saturate(1.08);
+    opacity:.9;
+    z-index:0;
+  }
+  .hero::after{
+    /* затемняем картинку */
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.45));
+    z-index:1;
+  }
+
+  /* левый блок поверх фото */
+  .left-panel{
+    position:relative; z-index:2;
+    max-width:560px;
+    margin:24px;
+    padding:18px;
+    background:var(--glass);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:16px;
+    box-shadow:0 20px 45px rgba(0,0,0,.35);
+  }
+  .left-panel h1{
+    margin:0 0 6px 0; font-size:32px; font-weight:900;
+    letter-spacing:.2px; text-shadow:0 2px 10px rgba(0,0,0,.4);
+  }
+  .subtitle{margin:0 0 14px 0; color:var(--muted)}
+
+  /* быстрые плитки-ссылки */
+  .quick{
+    display:grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap:10px; margin:12px 0 6px;
+  }
+  .tile{
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:12px;
+    padding:12px;
+    text-decoration:none; color:var(--text);
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .tile:hover{ outline:2px solid var(--green) }
+  .tile .t{font-weight:800}
+  .tile .d{color:var(--muted); font-size:13px; line-height:1.2}
+
+  /* список объектов (демо) */
+  .objects{margin-top:12px; display:grid; gap:10px}
+  .obj{
+    padding:10px 12px; border-radius:10px; background:rgba(0,0,0,.28);
+    display:flex; align-items:center; justify-content:space-between;
+    border:1px solid rgba(255,255,255,.16);
+  }
+  .obj b{letter-spacing:.2px}
+  .badge{
+    background:#24324d; padding:3px 8px; border-radius:999px;
+    font-size:12px; text-transform:uppercase;
+  }
+  .cta{margin-top:12px}
+  .cta a{
+    display:inline-block; background:var(--green); color:#062410;
+    font-weight:900; padding:10px 14px; border-radius:10px; text-decoration:none;
+  }
+  .cta a:hover{filter:brightness(1.05)}
 </style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="logo" onclick="location.href='main.html'">
-      <img src="https://cdn-icons-png.flaticon.com/512/679/679922.png" alt="logo">
-      ProStroy
+  <!-- общий верхний бар -->
+  <div id="site-header"></div>
+
+  <!-- фон с фото стройки и левым блоком -->
+  <section class="hero">
+    <img class="bg" src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=1600&q=80" alt="Стройка">
+    <div class="left-panel">
+      <h1>Добро пожаловать в ProStroy</h1>
+      <p class="subtitle">Быстрые действия и актуальные объекты</p>
+
+      <!-- быстрые плитки -->
+      <div class="quick">
+        <a class="tile" href="requests.html">
+          <span class="t">Заявки</span>
+          <span class="d">Список и статусы</span>
+        </a>
+        <a class="tile" href="transport.html">
+          <span class="t">Автотранспорт</span>
+          <span class="d">Создать заявку</span>
+        </a>
+        <a class="tile" href="profile.html">
+          <span class="t">Личный кабинет</span>
+          <span class="d" id="u-short">Профиль пользователя</span>
+        </a>
+      </div>
+
+      <!-- объекты (демо-список) -->
+      <div class="objects">
+        <div class="obj">
+          <div><b>Объект: Склад №7</b> — Восточный кластер</div>
+          <span class="badge">в работе</span>
+        </div>
+        <div class="obj">
+          <div><b>Объект: ЖК «Северный»</b> — Блок Б2</div>
+          <span class="badge">подготовка</span>
+        </div>
+        <div class="obj">
+          <div><b>Объект: Транспортный узел</b> — Секция 3</div>
+          <span class="badge">согласование</span>
+        </div>
+      </div>
+
+      <div class="cta">
+        <a href="transport.html">+ Новая заявка на автотранспорт</a>
+      </div>
     </div>
-    <div class="nav">
-      <a href="requests.html">Заявки</a>
-      <a href="transport.html">Заявка на автотранспорт</a>
-      <a href="profile.html"><span id="who">Личный кабинет</span></a>
-    </div>
-  </div>
+  </section>
 
-  <div class="hero">
-    <img src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=1400&q=80" alt="строительство">
-    <div class="caption">Добро пожаловать в систему ProStroy</div>
-  </div>
+  <!-- подключаем общий header.js и запускаем -->
+  <script src="header.js"></script>
+  <script>
+    (async ()=>{
+      // если не авторизован — отправим на страницу входа
+      try{
+        const { data:{ user } } = await supa.auth.getUser();
+        if (!user) { location.href = "index.html"; return; }
+        await loadHeader(); // подтянет header.html и покажет email
 
-<script>
-  const PROJECT_URL = "https://hvpbwpegxcbstmpngdyc.supabase.co";
-  const ANON_KEY    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cGJ3cGVneGNic3RtcG5nZHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2NDE4NjMsImV4cCI6MjA3NDIxNzg2M30.rtPrQVsaEFA-ee1RphLKKn8q3TSOXeapZnZgfe9HVws";
-  const supa = supabase.createClient(PROJECT_URL, ANON_KEY);
-
-  // показать ник/почту пользователя
-  (async()=>{
-    const { data: { user } } = await supa.auth.getUser();
-    if (user){
-      document.getElementById('who').textContent = user.email;
-    }
-  })();
-</script>
+        // короткая подсказка в плитке профиля
+        const short = document.getElementById('u-short');
+        if (short && user?.email) short.textContent = user.email;
+      }catch(e){
+        // если supa не определён (например, header.js не загрузился) — мягкий редирект
+        location.href = "index.html";
+      }
+    })();
+  </script>
 </body>
 </html>
