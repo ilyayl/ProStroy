@@ -50,20 +50,26 @@
 </aside>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script src="header.js?v=3"></script>
+<script src="header.js?v=hard"></script>
 <script>
-(async ()=>{
-  // ждём сессию → если нет — на логин, без «прыжка»
-  const { data:{ session } } = await supa.auth.getSession();
-  if(!session){ location.replace('index.html'); return; }
+(async () => {
+  try {
+    await makeClient();
+    const { data:{ session } } = await supa.auth.getSession();
+    if (!session) { location.href = 'index.html'; return; } // нет сессии — на логин
 
-  // грузим хедер, потом показываем страницу
-  await loadHeader();
-  document.body.style.display='block';
+    await loadHeader();
+    const email = session.user?.email;
+    if (email) document.getElementById('u-short')?.textContent = email;
+  } catch (e) {
+    console.error(e);
+    // если что-то упало — отправим на логин
+    location.href = 'index.html';
+    return;
+  }
 
-  // короткая подпись в плитке профиля
-  const email = session.user?.email;
-  if(email) document.getElementById('u-short').textContent = email;
+  // показать страницу (если ты где-то скрывал body)
+  document.body.style.display = 'block';
 })();
 </script>
 </body></html>
